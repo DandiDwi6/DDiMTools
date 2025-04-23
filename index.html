@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alat Kerja DDIM</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="header">
+    <div class="left-title">DDiM Tools</div>
+    <div class="summary-dropdown">
+      <button onclick="toggleDropdown()">Ringkasan ▼</button>
+      <div class="dropdown-content" id="summaryDropdown">
+        <p>Total Alat: <span id="totalAlat">0</span></p>
+        <p>Alat Aktif: <span id="alatAktif">0</span></p>
+        <p>Alat Rusak: <span id="alatRusak">0</span></p>
+      </div>
+    </div>
+  </div>  
+
+  <div class="grid-container">
+    <div class="box" onclick="navigateTo(1)">
+      <img src="./assets/img/toolbox.png" alt="Box 1" />
+      <p>Box Alat 1</p>
+    </div>
+    <div class="box" onclick="navigateTo(2)">
+      <img src="./assets/img/toolbox.png" alt="Box 2" />
+      <p>Box Alat 2</p>
+    </div>
+    <div class="box" onclick="navigateTo(3)">
+      <img src="./assets/img/toolbox.png" alt="Box 3" />
+      <p>Box Alat 3</p>
+    </div>
+    <div class="box" onclick="navigateTo(4)">
+      <img src="./assets/img/toolbox.png" alt="Box 4" />
+      <p>Box Alat 4</p>
+    </div>
+    <div class="box" onclick="navigateTo(5)">
+      <img src="./assets/img/toolbox.png" alt="Box 5" />
+      <p>Box Alat 5</p>
+    </div>
+    <div class="box" onclick="navigateTo(6)">
+      <img src="./assets/img/toolbox.png" alt="Box 6" />
+      <p>Box Alat 6</p>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 DDIM</div>
+
+  <script>
+    function navigateTo(boxNumber) {
+      window.location.href = `list.html?box=${boxNumber}`;
+    }
+
+    function toggleDropdown() {
+      const dropdown = document.querySelector(".summary-dropdown .dropdown-content");
+      dropdown.classList.toggle("show");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let total = 0;
+      let aktif = 0;
+      let rusak = 0;
+
+      for (let i = 1; i <= 6; i++) {
+        const data = JSON.parse(localStorage.getItem(`alatKerja_box${i}`)) || [];
+        total += data.length;
+        aktif += data.filter(item => item.status === "Aktif").length;
+        rusak += data.filter(item => item.status === "Rusak").length;
+      }
+
+      document.getElementById("totalAlat").textContent = total;
+      document.getElementById("alatAktif").textContent = aktif;
+      document.getElementById("alatRusak").textContent = rusak;
+    });
+
+    window.onclick = function(event) {
+      const isButton = event.target.closest('.summary-dropdown button');
+      if (!isButton) {
+        const dropdown = document.querySelector(".summary-dropdown .dropdown-content");
+        dropdown.classList.remove("show");
+      }
+    };
+  </script>
+</body>
+</html>
