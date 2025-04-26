@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alat Kerja DDIM</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bevan&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="header">
+  <div class="header glossy-header">
     <div class="left-title">DDiM Tools</div>
     <div class="summary-dropdown">
       <button onclick="toggleDropdown()">Ringkasan ▼</button>
@@ -54,7 +55,7 @@
     }
 
     function toggleDropdown() {
-      const dropdown = document.querySelector(".summary-dropdown .dropdown-content");
+      const dropdown = document.getElementById("summaryDropdown");
       dropdown.classList.toggle("show");
     }
 
@@ -78,7 +79,7 @@
     window.onclick = function(event) {
       const isButton = event.target.closest('.summary-dropdown button');
       if (!isButton) {
-        const dropdown = document.querySelector(".summary-dropdown .dropdown-content");
+        const dropdown = document.getElementById("summaryDropdown");
         dropdown.classList.remove("show");
       }
     };
