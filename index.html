@@ -10,14 +10,16 @@
 <body>
   <div class="header glossy-header">
     <div class="left-title">DDiM Tools</div>
-    <div class="summary-dropdown">
-      <button onclick="toggleDropdown()">Ringkasan ▼</button>
-      <div class="dropdown-content" id="summaryDropdown">
+    <div class="summary-dropdown" id="summaryDropdown">
+      <button id="summaryButton">
+        Ringkasan <span class="arrow">▼</span>
+      </button>
+      <div class="dropdown-content">
         <p>Total Alat: <span id="totalAlat">0</span></p>
         <p>Alat Aktif: <span id="alatAktif">0</span></p>
         <p>Alat Rusak: <span id="alatRusak">0</span></p>
       </div>
-    </div>
+    </div>    
   </div>  
 
   <div class="grid-container">
@@ -56,7 +58,14 @@
 
     function toggleDropdown() {
       const dropdown = document.getElementById("summaryDropdown");
+      const arrow = document.querySelector(".summary-dropdown .arrow");
       dropdown.classList.toggle("show");
+      
+      if (dropdown.classList.contains("show")) {
+        arrow.style.transform = "rotate(180deg)";
+      } else {
+        arrow.style.transform = "rotate(0deg)";
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -74,15 +83,23 @@
       document.getElementById("totalAlat").textContent = total;
       document.getElementById("alatAktif").textContent = aktif;
       document.getElementById("alatRusak").textContent = rusak;
+
+      document.getElementById("summaryButton").addEventListener("click", function(event) {
+        event.stopPropagation(); // Biar ga langsung nutup dropdown
+        toggleDropdown();
+      });
     });
 
-    window.onclick = function(event) {
-      const isButton = event.target.closest('.summary-dropdown button');
-      if (!isButton) {
-        const dropdown = document.getElementById("summaryDropdown");
+    window.addEventListener("click", function(event) {
+      const dropdown = document.getElementById("summaryDropdown");
+      const button = document.getElementById("summaryButton");
+      
+      if (!dropdown.contains(event.target) && !button.contains(event.target)) {
         dropdown.classList.remove("show");
+        const arrow = document.querySelector(".summary-dropdown .arrow");
+        arrow.style.transform = "rotate(0deg)";
       }
-    };
+    });
   </script>
 </body>
 </html>
