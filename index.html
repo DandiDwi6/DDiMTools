@@ -14,10 +14,10 @@
       <button id="summaryButton">
         Ringkasan <span class="arrow">▼</span>
       </button>
-      <div class="dropdown-content">
+      <div class="dropdown-content" id="dropdownContent">
         <p>Total Alat: <span id="totalAlat">0</span></p>
         <p>Alat Aktif: <span id="alatAktif">0</span></p>
-        <p>Alat Rusak: <span id="alatRusak">0</span></p>
+        <p>Alat Rusak: <span id="alatRusak" style="cursor:pointer; text-decoration:underline;">0</span></p>
       </div>
     </div>    
   </div>  
@@ -51,13 +51,22 @@
 
   <div class="footer">© 2025 DDIM</div>
 
+  <!-- Popup Modal -->
+  <div id="popupModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h2>Daftar Alat Rusak</h2>
+      <ul id="rusakList"></ul>
+    </div>
+  </div>
+
   <script>
     function navigateTo(boxNumber) {
       window.location.href = `list.html?box=${boxNumber}`;
     }
 
     function toggleDropdown() {
-      const dropdown = document.getElementById("summaryDropdown");
+      const dropdown = document.getElementById("dropdownContent");
       const arrow = document.querySelector(".summary-dropdown .arrow");
       dropdown.classList.toggle("show");
       
@@ -85,19 +94,61 @@
       document.getElementById("alatRusak").textContent = rusak;
 
       document.getElementById("summaryButton").addEventListener("click", function(event) {
-        event.stopPropagation(); // Biar ga langsung nutup dropdown
+        event.stopPropagation();
         toggleDropdown();
+      });
+
+      document.getElementById("alatRusak").addEventListener("click", function(event) {
+        event.stopPropagation(); // supaya ga nutup dropdown
+        showRusakList();
       });
     });
 
     window.addEventListener("click", function(event) {
-      const dropdown = document.getElementById("summaryDropdown");
-      const button = document.getElementById("summaryButton");
-      
-      if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+      const dropdown = document.getElementById("dropdownContent");
+      const summaryButton = document.getElementById("summaryButton");
+      if (!summaryButton.contains(event.target)) {
         dropdown.classList.remove("show");
-        const arrow = document.querySelector(".summary-dropdown .arrow");
-        arrow.style.transform = "rotate(0deg)";
+        document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
+      }
+    });
+
+    function showRusakList() {
+      const rusakList = document.getElementById("rusakList");
+      rusakList.innerHTML = "";
+
+      let found = false;
+
+      for (let i = 1; i <= 6; i++) {
+        const data = JSON.parse(localStorage.getItem(`alatKerja_box${i}`)) || [];
+        const rusakItems = data.filter(item => item.status === "Rusak");
+
+        rusakItems.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = `${item.nama} (Box ${i})`;
+          rusakList.appendChild(li);
+          found = true;
+        });
+      }
+
+      if (!found) {
+        const li = document.createElement("li");
+        li.textContent = "Tidak ada alat rusak.";
+        rusakList.appendChild(li);
+      }
+
+      document.getElementById("popupModal").style.display = "block";
+    }
+
+    // Tutup popup
+    document.getElementById("closeModal").addEventListener("click", function() {
+      document.getElementById("popupModal").style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+      const modal = document.getElementById("popupModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
       }
     });
   </script>
