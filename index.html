@@ -77,41 +77,23 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      let total = 0;
-      let aktif = 0;
-      let rusak = 0;
+    function updateSummary() {
+  let total = 0;
+  let aktif = 0;
+  let rusak = 0;
 
-      for (let i = 1; i <= 6; i++) {
-        const data = JSON.parse(localStorage.getItem(`alatKerja_box${i}`)) || [];
-        total += data.length;
-        aktif += data.filter(item => item.status === "Aktif").length;
-        rusak += data.filter(item => item.status === "Rusak").length;
-      }
+  for (let i = 1; i <= 6; i++) {
+    const data = JSON.parse(localStorage.getItem(`alatKerja_box${i}`)) || [];
+    total += data.length;
+    aktif += data.filter(item => (item.status || '').toLowerCase() === "baik").length;
+    rusak += data.filter(item => (item.status || '').toLowerCase() === "rusak").length;
+  }
 
-      document.getElementById("totalAlat").textContent = total;
-      document.getElementById("alatAktif").textContent = aktif;
-      document.getElementById("alatRusak").textContent = rusak;
+  document.getElementById("totalAlat").textContent = total;
+  document.getElementById("alatAktif").textContent = aktif;
+  document.getElementById("alatRusak").textContent = rusak;
+}
 
-      document.getElementById("summaryButton").addEventListener("click", function(event) {
-        event.stopPropagation();
-        toggleDropdown();
-      });
-
-      document.getElementById("alatRusak").addEventListener("click", function(event) {
-        event.stopPropagation(); // supaya ga nutup dropdown
-        showRusakList();
-      });
-    });
-
-    window.addEventListener("click", function(event) {
-      const dropdown = document.getElementById("dropdownContent");
-      const summaryButton = document.getElementById("summaryButton");
-      if (!summaryButton.contains(event.target)) {
-        dropdown.classList.remove("show");
-        document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
-      }
-    });
 
     function showRusakList() {
       const rusakList = document.getElementById("rusakList");
@@ -140,16 +122,37 @@
       document.getElementById("popupModal").style.display = "block";
     }
 
-    // Tutup popup
-    document.getElementById("closeModal").addEventListener("click", function() {
-      document.getElementById("popupModal").style.display = "none";
-    });
+    document.addEventListener("DOMContentLoaded", () => {
+      updateSummary();
 
-    window.addEventListener("click", function(event) {
-      const modal = document.getElementById("popupModal");
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
+      document.getElementById("summaryButton").addEventListener("click", function(event) {
+        event.stopPropagation();
+        toggleDropdown();
+      });
+
+      document.getElementById("alatRusak").addEventListener("click", function(event) {
+        event.stopPropagation();
+        showRusakList();
+      });
+
+      document.getElementById("closeModal").addEventListener("click", function() {
+        document.getElementById("popupModal").style.display = "none";
+      });
+
+      window.addEventListener("click", function(event) {
+        const modal = document.getElementById("popupModal");
+        const dropdown = document.getElementById("dropdownContent");
+        const summaryButton = document.getElementById("summaryButton");
+
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+
+        if (!summaryButton.contains(event.target)) {
+          dropdown.classList.remove("show");
+          document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
+        }
+      });
     });
   </script>
 </body>

@@ -73,7 +73,8 @@ function tambahAlat() {
     jumlah: '1',
     kondisi: 'Baik',
     merk: '',
-    tipe: ''
+    tipe: '',
+    status: 'Baik' // <--- TAMBAHKAN INI
   });
   renderTools();
 }
@@ -97,11 +98,12 @@ function simpanPerubahan() {
     const merk = item.querySelector('[data-field="merk"]').value;
     const tipe = item.querySelector('[data-field="tipe"]').value;
 
-    tools.push({ nama, jumlah, kondisi, merk, tipe });
+    tools.push({ nama, jumlah, kondisi, merk, tipe, status: kondisi }); // <--- TAMBAH status
   });
 
   saveToolsToStorage();
 }
+
 
 function filterAlat() {
   const search = document.getElementById("searchInput")?.value.toLowerCase() || "";
