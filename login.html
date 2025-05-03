@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Alat Kerja DDIM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login DDiM</h2>
+    <input type="text" id="username" placeholder="Nama pengguna">
+    <input type="password" id="password" placeholder="Kata sandi">
+    <button onclick="login()">Masuk</button>
+    <p id="loginError" style="color:red; display:none;">Username atau password salah</p>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      // Ganti ini sesuai keinginan
+      const validUser = "admin";
+      const validPass = "1234";
+
+      if (username === validUser && password === validPass) {
+        localStorage.setItem("loggedIn", "true");
+        window.location.href = "index.html";
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
+    }
+
+    // Redirect jika sudah login
+    if (localStorage.getItem("loggedIn") === "true") {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
