@@ -1,4 +1,4 @@
-const baseURL = 'https://script.google.com/macros/s/AKfycby2ADrR4wVODQPbjapXyTCqiOKf0yFFc5U7pLX4X0yaJ9FSkdyxBU8ouMSLcZDY2_LSyw/exec';
+const baseURL = 'https://script.google.com/macros/s/AKfycbzs-HyaqltInFaZDLszskvVxbxh-UOyZDwqAyy99s9HpS3DZNq5eMhJx2Nd6SmqQfaZrQ/exec';
 const username = 'guest';
 
 const urlParams = new URLSearchParams(window.location.search);
