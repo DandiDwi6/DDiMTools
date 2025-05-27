@@ -61,7 +61,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2ADrR4wVODQPbjapXyTCqiOKf0yFFc5U7pLX4X0yaJ9FSkdyxBU8ouMSLcZDY2_LSyw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBUXwnG_xx1S5RUGLzxIRev-4Pocbpyz_3woiGL2qAjtbI6bC3jRoaFMy2z_b0RYkjBQ/exec";
 
     async function login() {
       const username = document.getElementById("username").value.trim();
@@ -74,14 +74,21 @@
       }
 
       try {
-        const response = await fetch(SCRIPT_URL + `?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+        const params = new URLSearchParams({
+          action: "login",
+          username: username,
+          password: password
+        });
+
+        const response = await fetch(`${SCRIPT_URL}?${params.toString()}`);
         const result = await response.json();
 
         if (result.success) {
+          localStorage.setItem("loggedIn", "true");
           localStorage.setItem("loggedInUser", username);
           window.location.href = "index.html";
         } else {
-          errorMsg.textContent = "Username atau password salah.";
+          errorMsg.textContent = result.error || "Username atau password salah.";
         }
       } catch (err) {
         errorMsg.textContent = "Terjadi kesalahan koneksi.";
