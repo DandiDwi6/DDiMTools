@@ -1,40 +1,92 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Alat Kerja DDIM</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Alat Kerja DDIM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 0.6rem;
+      background: #1e3a56;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #162b40;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
-    <h2>Login DDiM</h2>
-    <input type="text" id="username" placeholder="Nama pengguna">
-    <input type="password" id="password" placeholder="Kata sandi">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Masuk</button>
-    <p id="loginError" style="color:red; display:none;">Username atau password salah</p>
+    <div class="error" id="errorMsg"></div>
   </div>
 
   <script>
-    function login() {
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2ADrR4wVODQPbjapXyTCqiOKf0yFFc5U7pLX4X0yaJ9FSkdyxBU8ouMSLcZDY2_LSyw/exec";
+
+    async function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
 
-      // Ganti ini sesuai keinginan
-      const validUser = "admin";
-      const validPass = "1234";
-
-      if (username === validUser && password === validPass) {
-        localStorage.setItem("loggedIn", "true");
-        window.location.href = "index.html";
-      } else {
-        document.getElementById("loginError").style.display = "block";
+      if (!username || !password) {
+        errorMsg.textContent = "Username dan password harus diisi.";
+        return;
       }
-    }
 
-    // Redirect jika sudah login
-    if (localStorage.getItem("loggedIn") === "true") {
-      window.location.href = "index.html";
+      try {
+        const response = await fetch(SCRIPT_URL + `?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+        const result = await response.json();
+
+        if (result.success) {
+          localStorage.setItem("loggedInUser", username);
+          window.location.href = "index.html";
+        } else {
+          errorMsg.textContent = "Username atau password salah.";
+        }
+      } catch (err) {
+        errorMsg.textContent = "Terjadi kesalahan koneksi.";
+        console.error("Login error:", err);
+      }
     }
   </script>
 </body>

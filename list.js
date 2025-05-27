@@ -1,125 +1,144 @@
-let tools = [];
-let storageKey = "alatKerja_default";
+const baseURL = 'https://script.google.com/macros/s/AKfycby2ADrR4wVODQPbjapXyTCqiOKf0yFFc5U7pLX4X0yaJ9FSkdyxBU8ouMSLcZDY2_LSyw/exec';
+const username = 'guest';
 
 const urlParams = new URLSearchParams(window.location.search);
-const boxId = urlParams.get("box") || "default";
-storageKey = `alatKerja_box${boxId}`;
+const box = urlParams.get('box') || 'boxdefault';
 
-function loadToolsFromStorage() {
-  const saved = localStorage.getItem(storageKey);
-  tools = saved ? JSON.parse(saved) : [];
-  renderTools();
+const alatListEl = document.getElementById("alatList");
+const searchInput = document.getElementById("searchInput");
+const kondisiFilter = document.getElementById("kondisiFilter");
+
+let dataAlat = [];
+
+function buatBarisAlat(alat, index) {
+  const div = document.createElement("div");
+  div.className = "tool-item";
+
+  div.innerHTML = `
+    <button class="delete-btn" onclick="hapusAlat(${index})">&times;</button>
+    <div class="tool-grid">
+      ${buatInput("Nama", "nama", alat.nama)}
+      ${buatInput("Jumlah", "jumlah", alat.jumlah, "number")}
+      ${buatSelect("Kondisi", "kondisi", alat.kondisi)}
+      ${buatInput("Merk", "merk", alat.merk)}
+      ${buatInput("Tipe", "tipe", alat.tipe)}
+      ${buatInput("Status", "status", alat.status)}
+    </div>
+  `;
+
+  alatListEl.appendChild(div);
 }
 
-function saveToolsToStorage() {
-  localStorage.setItem(storageKey, JSON.stringify(tools));
-  alert("Data alat berhasil disimpan!");
+function buatInput(label, name, value = "", type = "text") {
+  return `
+    <div class="form-group">
+      <label>${label}</label>
+      <input type="${type}" name="${name}" value="${value || ''}" />
+    </div>
+  `;
 }
 
-function renderTools(filtered = tools) {
-  const toolsList = document.querySelector('.tools-list');
-  toolsList.innerHTML = '';
+function buatSelect(label, name, value = "") {
+  return `
+    <div class="form-group">
+      <label>${label}</label>
+      <select name="${name}">
+        <option value="">-- Pilih --</option>
+        <option value="Baik" ${value === "Baik" ? "selected" : ""}>Baik</option>
+        <option value="Rusak" ${value === "Rusak" ? "selected" : ""}>Rusak</option>
+      </select>
+    </div>
+  `;
+}
 
-  filtered.forEach((tool, index) => {
-    const toolItem = document.createElement('div');
-    toolItem.className = 'tool-item';
+async function loadToolsFromServer() {
+  try {
+    const response = await fetch(`${baseURL}?username=${username}&box=${box}`);
+    const result = await response.json();
 
-    toolItem.innerHTML = `
-      <div class="tool-grid">
-        <div class="form-group">
-          <label>Nama</label>
-          <input type="text" value="${tool.nama}" data-index="${index}" data-field="nama" />
-        </div>
-        <div class="form-group">
-          <label>Jumlah</label>
-          <select data-index="${index}" data-field="jumlah">
-            ${[1,2,3,4,5].map(j => `<option value="${j}" ${tool.jumlah == j ? 'selected' : ''}>${j}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Kondisi</label>
-          <select data-index="${index}" data-field="kondisi">
-            <option value="Baik" ${tool.kondisi === 'Baik' ? 'selected' : ''}>Baik</option>
-            <option value="Rusak" ${tool.kondisi === 'Rusak' ? 'selected' : ''}>Rusak</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Merk</label>
-          <input type="text" value="${tool.merk}" data-index="${index}" data-field="merk" />
-        </div>
-        <div class="form-group">
-          <label>Tipe</label>
-          <input type="text" value="${tool.tipe}" data-index="${index}" data-field="tipe" />
-        </div>
-        <div class="form-group full-width">
-          <button class="delete-btn" title="Hapus" data-index="${index}">&times;</button>
-        </div>
-      </div>
-    `;
-    toolsList.appendChild(toolItem);
-  });
+    if (result.success) {
+      dataAlat = result.alatList || [];
+      renderAlatList();
+    } else {
+      console.error("Gagal memuat data:", result.error);
+    }
+  } catch (error) {
+    console.error("Gagal fetch:", error);
+  }
+}
 
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
-      const index = parseInt(this.getAttribute('data-index'));
-      deleteTool(index);
-    });
+function renderAlatList() {
+  alatListEl.innerHTML = "";
+  const keyword = searchInput.value.toLowerCase();
+  const kondisi = kondisiFilter.value;
+
+  dataAlat.forEach((alat, index) => {
+    const cocokCari = alat.nama?.toLowerCase().includes(keyword);
+    const cocokKondisi = !kondisi || alat.kondisi === kondisi;
+
+    if (cocokCari && cocokKondisi) {
+      buatBarisAlat(alat, index);
+    }
   });
 }
 
 function tambahAlat() {
-  tools.push({
-    nama: '',
-    jumlah: '1',
-    kondisi: 'Baik',
-    merk: '',
-    tipe: '',
-    status: 'Baik' // <--- TAMBAHKAN INI
-  });
-  renderTools();
+  dataAlat.push({ nama: "", jumlah: "", kondisi: "", merk: "", tipe: "", status: "" });
+  renderAlatList();
 }
 
-function deleteTool(index) {
-  if (confirm("Yakin ingin menghapus alat ini?")) {
-    tools.splice(index, 1);
-    renderTools();
-    saveToolsToStorage();
-  }
+function hapusAlat(index) {
+  dataAlat.splice(index, 1);
+  renderAlatList();
 }
 
 function simpanPerubahan() {
-  const items = document.querySelectorAll('.tool-item');
-  tools = [];
+  const itemEls = document.querySelectorAll(".tool-item");
+  const alatListBaru = [];
 
-  items.forEach((item) => {
-    const nama = item.querySelector('[data-field="nama"]').value;
-    const jumlah = item.querySelector('[data-field="jumlah"]').value;
-    const kondisi = item.querySelector('[data-field="kondisi"]').value;
-    const merk = item.querySelector('[data-field="merk"]').value;
-    const tipe = item.querySelector('[data-field="tipe"]').value;
-
-    tools.push({ nama, jumlah, kondisi, merk, tipe, status: kondisi }); // <--- TAMBAH status
+  itemEls.forEach(item => {
+    const inputs = item.querySelectorAll("input, select");
+    const alat = {};
+    inputs.forEach(input => {
+      alat[input.name] = input.value.trim();
+    });
+    alatListBaru.push(alat);
   });
 
-  saveToolsToStorage();
-}
+  const data = {
+    username,
+    box,
+    alatList: alatListBaru
+  };
 
+  fetch(baseURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+    .then(res => res.json())
+    .then(result => {
+      if (result.success) {
+        alert("✅ Data berhasil disimpan!");
+        dataAlat = alatListBaru;
+        renderAlatList();
+      } else {
+        alert("❌ Gagal menyimpan data: " + result.error);
+      }
+    })
+    .catch(err => {
+      console.error("Error saat menyimpan:", err);
+      alert("❌ Terjadi kesalahan saat menyimpan.");
+    });
+}
 
 function filterAlat() {
-  const search = document.getElementById("searchInput")?.value.toLowerCase() || "";
-  const kondisi = document.getElementById("kondisiFilter")?.value || "";
-
-  const filtered = tools.filter(tool => {
-    const cocokNama = tool.nama.toLowerCase().includes(search);
-    const cocokKondisi = !kondisi || tool.kondisi === kondisi;
-    return cocokNama && cocokKondisi;
-  });
-
-  renderTools(filtered);
+  renderAlatList();
 }
 
-// Agar HTML bisa pakai nama lama di onclick
-function addTool() { tambahAlat(); }
-function saveEditedData() { simpanPerubahan(); }
+// Event listeners
+searchInput.addEventListener("input", filterAlat);
+kondisiFilter.addEventListener("change", filterAlat);
 
-window.onload = loadToolsFromStorage;
+// Load awal
+loadToolsFromServer();
