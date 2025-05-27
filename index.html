@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <script>
+    // Redirect ke login jika belum login
     if (localStorage.getItem("loggedIn") !== "true") {
       window.location.href = "login.html";
     }
@@ -24,7 +25,7 @@
         <div class="dropdown-content" id="dropdownContent" style="display:none;">
           <p>Total Alat: <span id="totalAlat">0</span></p>
           <p>Alat Aktif: <span id="alatAktif">0</span></p>
-          <p>Alat Rusak: <span id="alatRusak" style="cursor:pointer; text-decoration:underline;">0</span></p>
+          <p id="alatRusak" style="cursor:pointer; text-decoration:underline;">Alat Rusak: <span>0</span></p>
         </div>
       </div>
 
@@ -33,6 +34,7 @@
   </div>
 
   <div class="grid-container">
+    <!-- Box alat, klik navigasi ke list.html?box=X -->
     <div class="box" onclick="navigateTo(1)"><img src="./assets/img/toolbox.png" alt="Box 1" /><p>Box Alat 1</p></div>
     <div class="box" onclick="navigateTo(2)"><img src="./assets/img/toolbox.png" alt="Box 2" /><p>Box Alat 2</p></div>
     <div class="box" onclick="navigateTo(3)"><img src="./assets/img/toolbox.png" alt="Box 3" /><p>Box Alat 3</p></div>
@@ -43,16 +45,16 @@
 
   <div class="footer">© 2025 DDIM</div>
 
-  <!-- Modal rusak -->
+  <!-- Modal daftar alat rusak -->
   <div id="popupModal" class="modal" style="display:none;">
     <div class="modal-content">
-      <span class="close-btn" id="closeModal">&times;</span>
+      <span class="close-btn" id="closeModal" style="cursor:pointer; font-size:1.5rem;">&times;</span>
       <h2>Daftar Alat Rusak</h2>
       <ul id="rusakList"></ul>
     </div>
   </div>
 
-  <!-- Modal QR -->
+  <!-- Modal QR Code -->
   <div id="qr-modal" class="modal" style="display: none;">
     <div class="modal-content">
       <h3>Pilih Box</h3>
@@ -69,6 +71,7 @@
     </div>
   </div>
 
+  <!-- Area cetak QR -->
   <div id="qr-print-area" style="display: none; text-align: center; padding-top: 50px;">
     <h2 id="qr-title"></h2>
     <div id="qr-code-print"></div>
@@ -78,32 +81,40 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBUXwnG_xx1S5RUGLzxIRev-4Pocbpyz_3woiGL2qAjtbI6bC3jRoaFMy2z_b0RYkjBQ/exec";
     const loggedInUser = localStorage.getItem("loggedInUser");
 
+    // Ambil data alat dari server dan update ringkasan
     async function fetchAlatFromServer() {
       let total = 0, aktif = 0, rusak = 0;
       const rusakItems = [];
 
       for (let box = 1; box <= 6; box++) {
-        const res = await fetch(`${SCRIPT_URL}?action=getAlat&username=${loggedInUser}&box=${box}`);
-        const result = await res.json();
+        try {
+          const res = await fetch(`${SCRIPT_URL}?action=getAlat&username=${encodeURIComponent(loggedInUser)}&box=${box}`);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          const result = await res.json();
 
-        if (result.success && Array.isArray(result.alatList)) {
-          total += result.alatList.length;
-          aktif += result.alatList.filter(a => (a.status || "").toLowerCase() === "baik").length;
-          const rusakInBox = result.alatList.filter(a => (a.status || "").toLowerCase() === "rusak");
+          if (result.success && Array.isArray(result.alatList)) {
+            total += result.alatList.length;
+            aktif += result.alatList.filter(a => (a.status || "").toLowerCase() === "baik").length;
+            const rusakInBox = result.alatList.filter(a => (a.status || "").toLowerCase() === "rusak");
 
-          rusak += rusakInBox.length;
-          rusakInBox.forEach(item => rusakItems.push(`${item.nama} (Box ${box})`));
+            rusak += rusakInBox.length;
+            rusakInBox.forEach(item => rusakItems.push(`${item.nama} (Box ${box})`));
+          }
+        } catch (e) {
+          console.error(`Error fetching alat box ${box}:`, e);
         }
       }
 
-      // Update tampilan
       document.getElementById("totalAlat").textContent = total;
       document.getElementById("alatAktif").textContent = aktif;
-      document.getElementById("alatRusak").textContent = rusak;
+      // Update count dan juga teks clickable rusak
+      const alatRusakSpan = document.querySelector("#alatRusak span");
+      alatRusakSpan.textContent = rusak;
 
       return rusakItems;
     }
 
+    // Modal QR
     function openQRModal() {
       document.getElementById("qr-modal").style.display = "flex";
     }
@@ -132,6 +143,7 @@
       window.location.href = `list.html?box=${box}`;
     }
 
+    // Toggle dropdown ringkasan
     function toggleDropdown() {
       const dropdown = document.getElementById("dropdownContent");
       const arrow = document.querySelector(".summary-dropdown .arrow");
@@ -144,6 +156,7 @@
       }
     }
 
+    // Tampilkan modal daftar alat rusak
     async function showRusakList() {
       const rusakListEl = document.getElementById("rusakList");
       rusakListEl.innerHTML = "<li>Memuat...</li>";
@@ -163,6 +176,13 @@
       document.getElementById("popupModal").style.display = "block";
     }
 
+    // Logout
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    // Setup event listeners setelah DOM siap
     document.addEventListener("DOMContentLoaded", async () => {
       await fetchAlatFromServer();
 
@@ -181,21 +201,18 @@
       });
 
       window.addEventListener("click", event => {
+        // Tutup modal jika klik di luar modal
         if (event.target === document.getElementById("popupModal")) {
           document.getElementById("popupModal").style.display = "none";
         }
 
+        // Tutup dropdown jika klik di luar tombol summary
         if (!document.getElementById("summaryButton").contains(event.target)) {
           document.getElementById("dropdownContent").style.display = "none";
           document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
         }
       });
     });
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "login.html";
-    }
   </script>
 </body>
 </html>
