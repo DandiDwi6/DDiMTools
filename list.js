@@ -7,7 +7,7 @@ window.onload = async function () {
 
   try {
     const res = await fetch(
-      `https://script.google.com/macros/s/AKfycbwj1Oqvvbl_sMv7Iu52jtPI1_falBlIVkBZihcOzFA-bhFlQdfUCnRZtOvk7btdtIhqCQ/exec?action=getAlat&box=${box}`
+      `https://script.google.com/macros/s/AKfycbz_O3FeVvSrdquTVMXyg3SnKWIT8JwujGeSJWIDydqh6_HVwuiSrKbFY4efcKoWPzWX5Q/exec?action=getAlat&box=${box}`
     );
     const data = await res.json();
     if (data.success) {
@@ -100,7 +100,7 @@ function tambahAlat() {
 
 async function simpanPerubahan() {
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwj1Oqvvbl_sMv7Iu52jtPI1_falBlIVkBZihcOzFA-bhFlQdfUCnRZtOvk7btdtIhqCQ/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbz_O3FeVvSrdquTVMXyg3SnKWIT8JwujGeSJWIDydqh6_HVwuiSrKbFY4efcKoWPzWX5Q/exec", {
       method: "POST",
       body: JSON.stringify({ box, alatList }),
     });
