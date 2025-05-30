@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | Alat Kerja DDIM</title>
+  <title>Daftar | Alat Kerja DDIM</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -24,7 +24,7 @@
       z-index: 0;
     }
 
-    .login-container {
+    .register-container {
       position: relative;
       z-index: 1;
       background: white;
@@ -35,7 +35,7 @@
       text-align: center;
     }
 
-    .login-container h2 {
+    h2 {
       margin-bottom: 1.5rem;
       color: #1e3a56;
     }
@@ -65,21 +65,25 @@
       background: #163049;
     }
 
-    .error {
-      color: red;
+    .message {
       margin-top: 1rem;
+      font-size: 0.95rem;
+      color: green;
       min-height: 1.2em;
     }
 
+    .error {
+      color: red;
+    }
+
     .links {
-      margin-top: 1.2rem;
+      margin-top: 1rem;
       font-size: 0.9rem;
     }
 
     .links a {
       color: #1e3a56;
       text-decoration: none;
-      margin: 0 0.5rem;
     }
 
     .links a:hover {
@@ -89,63 +93,57 @@
 </head>
 <body>
   <div class="overlay"></div>
-  <div class="login-container">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username" autocomplete="username" />
-    <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
-    <button onclick="login()">Masuk</button>
-    <div class="error" id="errorMsg"></div>
+  <div class="register-container">
+    <h2>Daftar Akun</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="register()">Daftar</button>
+    <div class="message" id="messageBox"></div>
     <div class="links">
-      <a href="daftar.html">Daftar</a> |
-      <a href="lupa-password.html">Lupa Password?</a>
+      <a href="login.html">Kembali ke Login</a>
     </div>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec";
 
-    async function login() {
+    async function register() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
-      errorMsg.textContent = "";
+      const messageBox = document.getElementById("messageBox");
 
       if (!username || !password) {
-        errorMsg.textContent = "Username dan password harus diisi.";
+        messageBox.textContent = "Semua field harus diisi.";
+        messageBox.className = "message error";
         return;
       }
 
       try {
-        const params = new URLSearchParams({
-          action: "login",
-          username,
-          password
-        });
-
-        const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
-          method: 'GET',
-          mode: 'cors',
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
           headers: {
-            'Accept': 'application/json'
-          }
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "register",
+            username,
+            password
+          })
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         const result = await response.json();
 
         if (result.success) {
-          localStorage.setItem("loggedIn", "true");
-          localStorage.setItem("loggedInUser", username);
-          window.location.href = "index.html";
+          messageBox.textContent = "Pendaftaran berhasil. Silakan login.";
+          messageBox.className = "message";
         } else {
-          errorMsg.textContent = result.error || "Username atau password salah.";
+          messageBox.textContent = result.error || "Pendaftaran gagal.";
+          messageBox.className = "message error";
         }
       } catch (err) {
-        errorMsg.textContent = "Terjadi kesalahan koneksi.";
-        console.error("Login error:", err);
+        messageBox.textContent = "Terjadi kesalahan koneksi.";
+        messageBox.className = "message error";
+        console.error("Register error:", err);
       }
     }
   </script>
