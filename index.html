@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <script>
-    // Redirect ke login jika belum login
-    if (localStorage.getItem("loggedIn") !== "true") {
-      window.location.href = "login.html";
-    }
-  </script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -34,7 +28,6 @@
   </div>
 
   <div class="grid-container">
-    <!-- Box alat, klik navigasi ke list.html?box=X -->
     <div class="box" onclick="navigateTo(1)"><img src="./assets/img/toolbox.png" alt="Box 1" /><p>Box Alat 1</p></div>
     <div class="box" onclick="navigateTo(2)"><img src="./assets/img/toolbox.png" alt="Box 2" /><p>Box Alat 2</p></div>
     <div class="box" onclick="navigateTo(3)"><img src="./assets/img/toolbox.png" alt="Box 3" /><p>Box Alat 3</p></div>
@@ -81,7 +74,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec";
     const loggedInUser = localStorage.getItem("loggedInUser");
 
-    // Ambil data alat dari server dan update ringkasan
     async function fetchAlatFromServer() {
       let total = 0, aktif = 0, rusak = 0;
       const rusakItems = [];
@@ -107,14 +99,11 @@
 
       document.getElementById("totalAlat").textContent = total;
       document.getElementById("alatAktif").textContent = aktif;
-      // Update count dan juga teks clickable rusak
-      const alatRusakSpan = document.querySelector("#alatRusak span");
-      alatRusakSpan.textContent = rusak;
+      document.querySelector("#alatRusak span").textContent = rusak;
 
       return rusakItems;
     }
 
-    // Modal QR
     function openQRModal() {
       document.getElementById("qr-modal").style.display = "flex";
     }
@@ -143,7 +132,6 @@
       window.location.href = `list.html?box=${box}`;
     }
 
-    // Toggle dropdown ringkasan
     function toggleDropdown() {
       const dropdown = document.getElementById("dropdownContent");
       const arrow = document.querySelector(".summary-dropdown .arrow");
@@ -156,7 +144,6 @@
       }
     }
 
-    // Tampilkan modal daftar alat rusak
     async function showRusakList() {
       const rusakListEl = document.getElementById("rusakList");
       rusakListEl.innerHTML = "<li>Memuat...</li>";
@@ -176,14 +163,18 @@
       document.getElementById("popupModal").style.display = "block";
     }
 
-    // Logout
     function logout() {
       localStorage.clear();
       window.location.href = "login.html";
     }
 
-    // Setup event listeners setelah DOM siap
     document.addEventListener("DOMContentLoaded", async () => {
+      // ⛔ Cek login terlebih dahulu
+      if (localStorage.getItem("loggedIn") !== "true") {
+        window.location.href = "login.html";
+        return;
+      }
+
       await fetchAlatFromServer();
 
       document.getElementById("summaryButton").addEventListener("click", e => {
@@ -201,12 +192,9 @@
       });
 
       window.addEventListener("click", event => {
-        // Tutup modal jika klik di luar modal
         if (event.target === document.getElementById("popupModal")) {
           document.getElementById("popupModal").style.display = "none";
         }
-
-        // Tutup dropdown jika klik di luar tombol summary
         if (!document.getElementById("summaryButton").contains(event.target)) {
           document.getElementById("dropdownContent").style.display = "none";
           document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
