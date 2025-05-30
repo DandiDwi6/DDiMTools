@@ -7,7 +7,7 @@ window.onload = async function () {
 
   try {
     const res = await fetch(
-      `https://script.google.com/macros/s/AKfycbz_O3FeVvSrdquTVMXyg3SnKWIT8JwujGeSJWIDydqh6_HVwuiSrKbFY4efcKoWPzWX5Q/exec?action=getAlat&box=${box}`
+      `https://script.google.com/macros/s/AKfycbwbOoUwJ3PkalSry7vtBQg_HgDQlwT9godXin2KAR0aqeqt9hKykUvE3GJOEo5PAIOXNQ/exec?action=getAlat&box=${box}`
     );
     const data = await res.json();
     if (data.success) {
