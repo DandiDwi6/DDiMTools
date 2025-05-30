@@ -100,7 +100,7 @@ function tambahAlat() {
 
 async function simpanPerubahan() {
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbz_O3FeVvSrdquTVMXyg3SnKWIT8JwujGeSJWIDydqh6_HVwuiSrKbFY4efcKoWPzWX5Q/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec", {
       method: "POST",
       body: JSON.stringify({ box, alatList }),
     });

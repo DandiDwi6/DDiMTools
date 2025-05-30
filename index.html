@@ -12,18 +12,19 @@
   <div class="header glossy-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
     <div class="left-title">DDiM Tools</div>
     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <button onclick="openQRModal()">Cetak Barcode</button>
+      <button class="primary-btn" onclick="openQRModal()">📦 Cetak Barcode</button>
 
-      <div class="summary-dropdown" id="summaryDropdown">
-        <button id="summaryButton">Ringkasan <span class="arrow">▼</span></button>
-        <div class="dropdown-content" id="dropdownContent" style="display:none;">
+      <!-- Dropdown Ringkasan -->
+      <div class="summary-dropdown" id="summaryDropdown" style="position: relative; z-index: 100;">
+        <button id="summaryButton" onclick="toggleDropdown()">📊 Ringkasan <span class="arrow">▼</span></button>
+        <div class="dropdown-content" id="dropdownContent">
           <p>Total Alat: <span id="totalAlat">0</span></p>
           <p>Alat Aktif: <span id="alatAktif">0</span></p>
           <p id="alatRusak" style="cursor:pointer; text-decoration:underline;">Alat Rusak: <span>0</span></p>
         </div>
       </div>
 
-      <button onclick="logout()">Logout</button>
+      <button class="danger-btn" onclick="logout()">🚪 Logout</button>
     </div>
   </div>
 
@@ -38,8 +39,8 @@
 
   <div class="footer">© 2025 DDIM</div>
 
-  <!-- Modal daftar alat rusak -->
-  <div id="popupModal" class="modal" style="display:none;">
+  <!-- Modal Alat Rusak -->
+  <div id="popupModal" class="modal">
     <div class="modal-content">
       <span class="close-btn" id="closeModal" style="cursor:pointer; font-size:1.5rem;">&times;</span>
       <h2>Daftar Alat Rusak</h2>
@@ -48,7 +49,7 @@
   </div>
 
   <!-- Modal QR Code -->
-  <div id="qr-modal" class="modal" style="display: none;">
+  <div id="qr-modal" class="modal">
     <div class="modal-content">
       <h3>Pilih Box</h3>
       <select id="boxSelect">
@@ -64,7 +65,7 @@
     </div>
   </div>
 
-  <!-- Area cetak QR -->
+  <!-- Area Cetak QR -->
   <div id="qr-print-area" style="display: none; text-align: center; padding-top: 50px;">
     <h2 id="qr-title"></h2>
     <div id="qr-code-print"></div>
@@ -105,12 +106,13 @@
     }
 
     function openQRModal() {
-      document.getElementById("qr-modal").style.display = "flex";
-    }
+  document.getElementById("qr-modal").classList.add("show");
+}
 
     function closeQRModal() {
-      document.getElementById("qr-modal").style.display = "none";
-    }
+  document.getElementById("qr-modal").classList.remove("show");
+}
+
 
     function printQR() {
       const boxId = document.getElementById("boxSelect").value;
@@ -135,13 +137,10 @@
     function toggleDropdown() {
       const dropdown = document.getElementById("dropdownContent");
       const arrow = document.querySelector(".summary-dropdown .arrow");
-      if (dropdown.style.display === "block") {
-        dropdown.style.display = "none";
-        arrow.style.transform = "rotate(0deg)";
-      } else {
-        dropdown.style.display = "block";
-        arrow.style.transform = "rotate(180deg)";
-      }
+      const isVisible = dropdown.style.display === "block";
+
+      dropdown.style.display = isVisible ? "none" : "block";
+      arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
     }
 
     async function showRusakList() {
@@ -160,7 +159,8 @@
         });
       }
 
-      document.getElementById("popupModal").style.display = "block";
+      document.getElementById("popupModal").classList.add("show");
+
     }
 
     function logout() {
@@ -169,18 +169,19 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // ⛔ Cek login terlebih dahulu
       if (localStorage.getItem("loggedIn") !== "true") {
         window.location.href = "login.html";
         return;
+        window.addEventListener("click", event => {
+        const qrModal = document.getElementById("qr-modal");
+     if (event.target === qrModal) {
+        qrModal.classList.remove("show");
+  }
+});
+
       }
 
       await fetchAlatFromServer();
-
-      document.getElementById("summaryButton").addEventListener("click", e => {
-        e.stopPropagation();
-        toggleDropdown();
-      });
 
       document.getElementById("alatRusak").addEventListener("click", e => {
         e.stopPropagation();
@@ -188,16 +189,19 @@
       });
 
       document.getElementById("closeModal").addEventListener("click", () => {
-        document.getElementById("popupModal").style.display = "none";
+        document.getElementById("popupModal").classList.remove("show");
+
       });
 
       window.addEventListener("click", event => {
+        const dropdown = document.getElementById("dropdownContent");
+        if (!event.target.closest(".summary-dropdown")) {
+          dropdown.style.display = "none";
+          document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
+        }
+
         if (event.target === document.getElementById("popupModal")) {
           document.getElementById("popupModal").style.display = "none";
-        }
-        if (!document.getElementById("summaryButton").contains(event.target)) {
-          document.getElementById("dropdownContent").style.display = "none";
-          document.querySelector(".summary-dropdown .arrow").style.transform = "rotate(0deg)";
         }
       });
     });
