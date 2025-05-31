@@ -105,7 +105,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec";
 
     async function register() {
       const username = document.getElementById("username").value.trim();
@@ -119,7 +119,7 @@
       }
 
       try {
-        const response = await fetch(`https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec?action=register&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec?action=register&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
 
         const result = await response.json();
 

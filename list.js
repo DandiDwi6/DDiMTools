@@ -4,10 +4,9 @@ let alatList = [];
 
 window.onload = async function () {
   if (!box) return alert("Box tidak ditemukan di URL.");
-
   try {
     const res = await fetch(
-      `https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec?action=getAlat&box=${box}`
+      `https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec?action=getAlat&box=${box}`
     );
     const data = await res.json();
     if (data.success) {
