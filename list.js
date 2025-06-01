@@ -93,19 +93,35 @@ function tambahAlat() {
     merk: "",
     tipe: "",
     status: "",
+    isBaru: true // Tambahkan flag penanda data baru
   });
   renderList();
 }
 
+
 async function simpanPerubahan() {
   try {
+    const dataBaru = alatList.filter(alat => alat.isBaru); // hanya kirim yang baru
+
+    if (dataBaru.length === 0) {
+      alert("Tidak ada data baru yang perlu disimpan.");
+      return;
+    }
+
     const res = await fetch("https://script.google.com/macros/s/AKfycbwN54G1AqiIszXGwmdzkgZXcz2Qoc4MDjAZ_sH5Ou-Mok4pfCHsb8n7a1A3gCvjQShkmQ/exec", {
       method: "POST",
-      body: JSON.stringify({ box, alatList }),
+      body: JSON.stringify({ box, alatList: dataBaru }),
     });
+
     const result = await res.json();
     if (result.success) {
-      alert("Data berhasil disimpan.");
+      alert("Data baru berhasil disimpan.");
+
+      // Hapus flag isBaru agar tidak dikirim lagi
+      alatList.forEach(alat => {
+        if (alat.isBaru) delete alat.isBaru;
+      });
+
     } else {
       alert("Gagal menyimpan data: " + result.error);
     }
@@ -114,6 +130,7 @@ async function simpanPerubahan() {
     alert("Terjadi kesalahan saat menyimpan.");
   }
 }
+
 
 function filterAlat() {
   renderList();
