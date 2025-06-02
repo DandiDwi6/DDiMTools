@@ -74,6 +74,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec";
     const loggedInUser = localStorage.getItem("loggedInUser");
+    let cachedRusakItems = []; // ✅ Global cache untuk alat rusak
 
     async function fetchAlatFromServer() {
       let total = 0, aktif = 0, rusak = 0;
@@ -101,18 +102,16 @@
       document.getElementById("totalAlat").textContent = total;
       document.getElementById("alatAktif").textContent = aktif;
       document.querySelector("#alatRusak span").textContent = rusak;
-
-      return rusakItems;
+      cachedRusakItems = rusakItems; // ✅ Simpan cache
     }
 
     function openQRModal() {
-  document.getElementById("qr-modal").classList.add("show");
-}
+      document.getElementById("qr-modal").classList.add("show");
+    }
 
     function closeQRModal() {
-  document.getElementById("qr-modal").classList.remove("show");
-}
-
+      document.getElementById("qr-modal").classList.remove("show");
+    }
 
     function printQR() {
       const boxId = document.getElementById("boxSelect").value;
@@ -146,13 +145,12 @@
     async function showRusakList() {
       const rusakListEl = document.getElementById("rusakList");
       rusakListEl.innerHTML = "<li>Memuat...</li>";
-      const rusakItems = await fetchAlatFromServer();
 
-      rusakListEl.innerHTML = "";
-      if (rusakItems.length === 0) {
+      if (cachedRusakItems.length === 0) {
         rusakListEl.innerHTML = "<li>Tidak ada alat rusak.</li>";
       } else {
-        rusakItems.forEach(item => {
+        rusakListEl.innerHTML = "";
+        cachedRusakItems.forEach(item => {
           const li = document.createElement("li");
           li.textContent = item;
           rusakListEl.appendChild(li);
@@ -160,7 +158,6 @@
       }
 
       document.getElementById("popupModal").classList.add("show");
-
     }
 
     function logout() {
@@ -172,13 +169,6 @@
       if (localStorage.getItem("loggedIn") !== "true") {
         window.location.href = "login.html";
         return;
-        window.addEventListener("click", event => {
-        const qrModal = document.getElementById("qr-modal");
-     if (event.target === qrModal) {
-        qrModal.classList.remove("show");
-  }
-});
-
       }
 
       await fetchAlatFromServer();
@@ -190,7 +180,6 @@
 
       document.getElementById("closeModal").addEventListener("click", () => {
         document.getElementById("popupModal").classList.remove("show");
-
       });
 
       window.addEventListener("click", event => {
@@ -202,6 +191,11 @@
 
         if (event.target === document.getElementById("popupModal")) {
           document.getElementById("popupModal").style.display = "none";
+        }
+
+        const qrModal = document.getElementById("qr-modal");
+        if (event.target === qrModal) {
+          qrModal.classList.remove("show");
         }
       });
     });
