@@ -129,10 +129,14 @@ function tambahAlat() {
 
 async function simpanPerubahan() {
   try {
-    const dataBaru = alatList.filter(alat => alat.isBaru);
+    const dataBaru = alatList
+      .filter(alat => alat.isBaru)
+      .filter(alat =>
+        alat.nama || alat.jumlah || alat.kondisi || alat.merk || alat.tipe || alat.status
+      );
 
     if (dataBaru.length === 0) {
-      alert("Tidak ada data baru yang perlu disimpan.");
+      alert("Tidak ada data baru yang valid untuk disimpan.");
       return;
     }
 
@@ -147,6 +151,7 @@ async function simpanPerubahan() {
       alatList.forEach(alat => {
         if (alat.isBaru) delete alat.isBaru;
       });
+      renderList();
     } else {
       alert("Gagal menyimpan data: " + result.error);
     }
@@ -155,6 +160,7 @@ async function simpanPerubahan() {
     alert("Terjadi kesalahan saat menyimpan.");
   }
 }
+
 
 function filterAlat() {
   renderList();
