@@ -18,6 +18,7 @@
       <div class="summary-dropdown" id="summaryDropdown" style="position: relative; z-index: 100;">
         <button id="summaryButton" onclick="toggleDropdown()"> Ringkasan <span class="arrow">▼</span></button>
         <div class="dropdown-content" id="dropdownContent">
+        <div id="summaryLoader" class="small-spinner" style="display:none; margin: 10px auto;"></div>
           <p>Total Alat: <span id="totalAlat">0</span></p>
           <p>Alat Aktif: <span id="alatAktif">0</span></p>
           <p id="alatRusak" style="cursor:pointer; text-decoration:underline;">Alat Rusak: <span>0</span></p>
@@ -77,6 +78,9 @@
     let cachedRusakItems = []; // ✅ Global cache untuk alat rusak
 
    async function fetchAlatFromServer() {
+  const loader = document.getElementById("summaryLoader");
+  loader.style.display = "block";
+
   let total = 0, aktif = 0, rusak = 0;
   const rusakItems = [];
 
@@ -103,7 +107,10 @@
   document.getElementById("alatAktif").textContent = aktif;
   document.querySelector("#alatRusak span").textContent = rusak;
   cachedRusakItems = rusakItems;
+
+  loader.style.display = "none";
 }
+
 
 
     function openQRModal() {
