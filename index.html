@@ -76,34 +76,35 @@
     const loggedInUser = localStorage.getItem("loggedInUser");
     let cachedRusakItems = []; // ✅ Global cache untuk alat rusak
 
-    async function fetchAlatFromServer() {
-      let total = 0, aktif = 0, rusak = 0;
-      const rusakItems = [];
+   async function fetchAlatFromServer() {
+  let total = 0, aktif = 0, rusak = 0;
+  const rusakItems = [];
 
-      for (let box = 1; box <= 6; box++) {
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=getAlat&username=${encodeURIComponent(loggedInUser)}&box=${box}`);
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-          const result = await res.json();
+  for (let box = 1; box <= 6; box++) {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=getAlat&username=${encodeURIComponent(loggedInUser)}&box=${box}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const result = await res.json();
 
-          if (result.success && Array.isArray(result.alatList)) {
-            total += result.alatList.length;
-            aktif += result.alatList.filter(a => (a.status || "").toLowerCase() === "baik").length;
-            const rusakInBox = result.alatList.filter(a => (a.status || "").toLowerCase() === "rusak");
+      if (result.success && Array.isArray(result.alatList)) {
+        total += result.alatList.length;
+        aktif += result.alatList.filter(a => (a.kondisi || "").trim().toLowerCase() === "baik").length;
 
-            rusak += rusakInBox.length;
-            rusakInBox.forEach(item => rusakItems.push(`${item.nama} (Box ${box})`));
-          }
-        } catch (e) {
-          console.error(`Error fetching alat box ${box}:`, e);
-        }
+        const rusakInBox = result.alatList.filter(a => (a.kondisi || "").trim().toLowerCase() === "rusak");
+        rusak += rusakInBox.length;
+        rusakInBox.forEach(item => rusakItems.push(`${item.nama} (Box ${box})`));
       }
-
-      document.getElementById("totalAlat").textContent = total;
-      document.getElementById("alatAktif").textContent = aktif;
-      document.querySelector("#alatRusak span").textContent = rusak;
-      cachedRusakItems = rusakItems; // ✅ Simpan cache
+    } catch (e) {
+      console.error(`Error fetching alat box ${box}:`, e);
     }
+  }
+
+  document.getElementById("totalAlat").textContent = total;
+  document.getElementById("alatAktif").textContent = aktif;
+  document.querySelector("#alatRusak span").textContent = rusak;
+  cachedRusakItems = rusakItems;
+}
+
 
     function openQRModal() {
       document.getElementById("qr-modal").classList.add("show");
