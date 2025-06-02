@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | Alat Kerja DDIM</title>
+  <title>Login | DDIM Tools</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: url('./assets/img/login.jpg') no-repeat center center fixed;
+      background: url('./assets/img/backgorud2.jpg') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      position: relative;
     }
 
     .overlay {
@@ -38,6 +39,7 @@
     .login-container h2 {
       margin-bottom: 1.5rem;
       color: #1e3a56;
+      font-size: 1.4rem;
     }
 
     input {
@@ -47,6 +49,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
 
     button {
@@ -90,14 +93,14 @@
 <body>
   <div class="overlay"></div>
   <div class="login-container">
-    <h2>Login</h2>
+    <h2>🛠️Login DDIM Tools</h2>
     <input type="text" id="username" placeholder="Username" autocomplete="username" />
     <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
     <button onclick="login()">Masuk</button>
     <div class="error" id="errorMsg"></div>
     <div class="links">
-      <a href="daftar.html">Daftar</a> |
-      <a href="lupa-password.html">Lupa Password?</a>
+      <a href="daftar.html">➕Daftar</a> |
+      <a href="lupa-password.html">❗Lupa Password?</a>
     </div>
   </div>
 

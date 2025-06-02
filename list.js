@@ -160,7 +160,9 @@ async function simpanPerubahan() {
     alert("Terjadi kesalahan saat menyimpan.");
   }
 }
-
+  if (box) {
+    document.getElementById('judulBox').textContent = 'Daftar Alat Box ' + box;
+  }
 
 function filterAlat() {
   renderList();
