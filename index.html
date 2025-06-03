@@ -71,7 +71,7 @@
     <h2 id="qr-title"></h2>
     <div id="qr-code-print"></div>
   </div>
-  
+  <div id="toast" class="toast">Berhasil</div>
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec";
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -236,9 +236,13 @@ async function loadBoxes() {
         const box = document.createElement("div");
         box.className = "box";
         box.innerHTML = `
-      <img src="assets/img/toolbox.png" alt="Toolbox" class="box-image">
-      <p>${boxName}</p>
-      <button class="view-button" onclick="navigateTo(${boxNumber})">Lihat Alat</button>`;
+  <img src="assets/img/toolbox.png" alt="Toolbox" class="box-image">
+  <p>${boxName}</p>
+  <div class="box-actions">
+    <button class="view-button" onclick="navigateTo(${boxNumber})">Lihat Alat</button>
+    <button class="delete-button" onclick="hapusBox('${boxName}')">Hapus Box</button>
+  </div>`;
+
 
         container.appendChild(box);
       });
@@ -254,7 +258,29 @@ async function loadBoxes() {
     document.getElementById("loader").classList.add("hidden");
   }
 }
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "toast show";
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 3000);
+}
+function hapusBox(boxName) {
+  if (!confirm(`Yakin ingin menghapus ${boxName}? Semua data di dalamnya akan ikut terhapus.`)) return;
 
+  fetch(`${SCRIPT_URL}?action=hapusBox&boxId=${encodeURIComponent(boxName)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast(`${boxName} berhasil dihapus.`);
+        loadBoxes();
+      } else {
+        showToast(`Gagal menghapus ${boxName}.`);
+      }
+    })
+    .catch(() => showToast("Terjadi kesalahan saat menghapus."));
+}
 
   </script>
 </body>
