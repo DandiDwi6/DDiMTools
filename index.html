@@ -13,6 +13,7 @@
     <div class="left-title">DDiM Tools</div>
     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
       <button class="primary-btn" onclick="openQRModal()"> Cetak Barcode</button>
+      <button class="add-box-btn" onclick="handleTambahBox()">Tambah Box</button>
 
       <!-- Dropdown Ringkasan -->
       <div class="summary-dropdown" id="summaryDropdown" style="position: relative; z-index: 100;">
@@ -29,14 +30,10 @@
     </div>
   </div>
 
-  <div class="grid-container">
-    <div class="box" onclick="navigateTo(1)"><img src="./assets/img/toolbox.png" alt="Box 1" /><p>Box Alat 1</p></div>
-    <div class="box" onclick="navigateTo(2)"><img src="./assets/img/toolbox.png" alt="Box 2" /><p>Box Alat 2</p></div>
-    <div class="box" onclick="navigateTo(3)"><img src="./assets/img/toolbox.png" alt="Box 3" /><p>Box Alat 3</p></div>
-    <div class="box" onclick="navigateTo(4)"><img src="./assets/img/toolbox.png" alt="Box 4" /><p>Box Alat 4</p></div>
-    <div class="box" onclick="navigateTo(5)"><img src="./assets/img/toolbox.png" alt="Box 5" /><p>Box Alat 5</p></div>
-    <div class="box" onclick="navigateTo(6)"><img src="./assets/img/toolbox.png" alt="Box 6" /><p>Box Alat 6</p></div>
-  </div>
+  <div class="grid-container" id="boxContainer">
+  <!-- Box akan dimuat di sini secara dinamis -->
+</div>
+
 
   <div class="footer">© 2025 DDIM</div>
 
@@ -174,6 +171,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+      await loadBoxes();
       if (localStorage.getItem("loggedIn") !== "true") {
         window.location.href = "login.html";
         return;
@@ -207,6 +205,49 @@
         }
       });
     });
+    function handleTambahBox() {
+  fetch(`${SCRIPT_URL}?action=tambahBox`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.boxId) {
+        alert(`Box ${data.boxId} berhasil ditambahkan!`);
+        loadBoxes(); // langsung muat ulang box
+      } else {
+        alert("Gagal menambahkan box.");
+      }
+    });
+}
+
+async function loadBoxes() {
+  try {
+    const response = await fetch(SCRIPT_URL + "?action=getAllBox");
+    const result = await response.json();  // result = { success: true, boxList: [...] }
+
+    if (result.success && Array.isArray(result.boxList)) {
+      const container = document.getElementById("boxContainer");
+      container.innerHTML = ""; // kosongkan
+
+      result.boxList.forEach((boxName, i) => {
+        const boxNumber = boxName.replace(/[^\d]/g, "");
+        const box = document.createElement("div");
+        box.className = "box";
+        box.innerHTML = `
+      <img src="assets/img/toolbox.png" alt="Toolbox" class="box-image">
+      <p>${boxName}</p>
+      <button class="view-button" onclick="navigateTo(${boxNumber})">Lihat Alat</button>`;
+
+        container.appendChild(box);
+      });
+    } else {
+      throw new Error("Data box tidak valid.");
+    }
+  } catch (err) {
+    console.error("Gagal memuat box:", err);
+    document.getElementById("boxContainer").innerHTML = "<p>Gagal memuat box.</p>";
+  }
+}
+
+
   </script>
 </body>
 </html>
