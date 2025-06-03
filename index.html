@@ -9,6 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bevan&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+  </div>
   <div class="header glossy-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
     <div class="left-title">DDiM Tools</div>
     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
@@ -68,7 +71,7 @@
     <h2 id="qr-title"></h2>
     <div id="qr-code-print"></div>
   </div>
-
+  
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYldFDEU2dT18xb2_43mxcxKCk2HOD9a5CNkyJWCy9kXqb7HW48iXjDXXcKIfKq3Wl2Q/exec";
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -220,6 +223,7 @@
 
 async function loadBoxes() {
   try {
+       document.getElementById("loader").classList.remove("hidden");
     const response = await fetch(SCRIPT_URL + "?action=getAllBox");
     const result = await response.json();  // result = { success: true, boxList: [...] }
 
@@ -244,6 +248,10 @@ async function loadBoxes() {
   } catch (err) {
     console.error("Gagal memuat box:", err);
     document.getElementById("boxContainer").innerHTML = "<p>Gagal memuat box.</p>";
+  }
+  finally {
+    // Sembunyikan loader
+    document.getElementById("loader").classList.add("hidden");
   }
 }
 
